@@ -6,6 +6,7 @@ public class Library {
     private List<User> users = new ArrayList<>();
     private final String BOOK_FILE = "data/books.txt";
     private final String USER_FILE = "data/users.txt";
+    private final String BORROWED_FILE = "data/borrowed.txt";
     private Map<String, String> borrowedBooks = new HashMap<>(); // bookId -> userId
 
     public Library() {
@@ -55,6 +56,7 @@ public class Library {
                 if (!borrowedBooks.containsKey(bookId)) {
                     borrowedBooks.put(bookId, userId);
                     book.setStock(book.getStock() - 1);
+                    saveData();
                     return true;
                 }
             }
@@ -88,6 +90,7 @@ public class Library {
                 }
             }
             borrowedBooks.remove(bookId);
+            saveData();
             return true;
         }
         return false;
@@ -95,9 +98,11 @@ public class Library {
 
     private void saveData() {
         try (ObjectOutputStream out1 = new ObjectOutputStream(new FileOutputStream(BOOK_FILE));
-             ObjectOutputStream out2 = new ObjectOutputStream(new FileOutputStream(USER_FILE))) {
+             ObjectOutputStream out2 = new ObjectOutputStream(new FileOutputStream(USER_FILE));
+             ObjectOutputStream out3 = new ObjectOutputStream(new FileOutputStream(BORROWED_FILE))) {
             out1.writeObject(books);
             out2.writeObject(users);
+            out3.writeObject(borrowedBooks);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -107,6 +112,7 @@ public class Library {
         try {
             File bookFile = new File(BOOK_FILE);
             File userFile = new File(USER_FILE);
+            File borrowedFile = new File(BORROWED_FILE);
             if (bookFile.exists()) {
                 ObjectInputStream in1 = new ObjectInputStream(new FileInputStream(BOOK_FILE));
                 books = (List<Book>) in1.readObject();
@@ -116,6 +122,11 @@ public class Library {
                 ObjectInputStream in2 = new ObjectInputStream(new FileInputStream(USER_FILE));
                 users = (List<User>) in2.readObject();
                 in2.close();
+            }
+            if (borrowedFile.exists()) {
+                ObjectInputStream in3 = new ObjectInputStream(new FileInputStream(BORROWED_FILE));
+                borrowedBooks = (Map<String, String>) in3.readObject();
+                in3.close();
             }
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();

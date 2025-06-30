@@ -115,6 +115,17 @@ public class UserLoginGUI extends JFrame {
         gbc.gridwidth = 2;
         add(createUserLabel, gbc);
 
+        // Add Back button
+        JButton backButton = new JButton("Back");
+        gbc.gridx = 0;
+        gbc.gridy = 11;
+        gbc.gridwidth = 2;
+        add(backButton, gbc);
+        backButton.addActionListener(e -> {
+            dispose();
+            new MainLoginGUI().setVisible(true);
+        });
+
         loginButton.addActionListener(e -> handleLogin());
         createUserButton.addActionListener(e -> handleCreateUser());
     }
@@ -146,7 +157,7 @@ public class UserLoginGUI extends JFrame {
                 createUserLabel.setText("Cannot register as admin.");
                 return;
             }
-            // Check for duplicate user ID
+        
             boolean exists = false;
             for (User user : library.getUsers()) {
                 if (user.getId().equals(id)) {

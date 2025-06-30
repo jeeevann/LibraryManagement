@@ -27,6 +27,20 @@ public class LibraryGUI extends JFrame {
             tabbedPane.addTab("Borrow/Return", createBorrowPanel());
         }
         add(tabbedPane);
+
+        // Add Back button
+        JButton backButton = new JButton("Back");
+        backButton.addActionListener(e -> {
+            dispose();
+            if (adminMode) {
+                new AdminLoginGUI().setVisible(true);
+            } else {
+                new UserLoginGUI().setVisible(true);
+            }
+        });
+        JPanel bottomPanel = new JPanel();
+        bottomPanel.add(backButton);
+        add(bottomPanel, BorderLayout.SOUTH);
     }
 
     private JPanel createUserPanel() {
@@ -167,19 +181,49 @@ public class LibraryGUI extends JFrame {
         borrowButton.addActionListener(e -> {
             String bookId = bookIdField.getText().trim();
             if (!bookId.isEmpty()) {
-                library.borrowBook(bookId, currentUser.getId());
-                // Refresh the panel to update the table
-                SwingUtilities.getWindowAncestor(panel).dispose();
-                new LibraryGUI(library, false, currentUser).setVisible(true);
+                boolean success = library.borrowBook(bookId, currentUser.getId());
+                Book found = null;
+                for (Book b : library.getBooks()) {
+                    if (b.getId().equals(bookId)) {
+                        found = b;
+                        break;
+                    }
+                }
+                if (!success) {
+                    if (found == null) {
+                        JOptionPane.showMessageDialog(panel, "Book not found.", "Error", JOptionPane.ERROR_MESSAGE);
+                    } else if (found.getStock() == 0) {
+                        JOptionPane.showMessageDialog(panel, "Book is not available (stock is 0).", "Not Available", JOptionPane.WARNING_MESSAGE);
+                    } else {
+                        JOptionPane.showMessageDialog(panel, "Book is already borrowed by someone else.\nCurrent stock: " + found.getStock(), "Not Available", JOptionPane.WARNING_MESSAGE);
+                    }
+                } else {
+                    JOptionPane.showMessageDialog(panel, "Book borrowed successfully!\nCurrent stock: " + found.getStock(), "Success", JOptionPane.INFORMATION_MESSAGE);
+                    // Refresh the panel to update the table
+                    SwingUtilities.getWindowAncestor(panel).dispose();
+                    new LibraryGUI(library, false, currentUser).setVisible(true);
+                }
             }
         });
         returnButton.addActionListener(e -> {
             String bookId = bookIdField.getText().trim();
             if (!bookId.isEmpty()) {
-                library.returnBook(bookId);
-                // Refresh the panel to update the table
-                SwingUtilities.getWindowAncestor(panel).dispose();
-                new LibraryGUI(library, false, currentUser).setVisible(true);
+                boolean success = library.returnBook(bookId);
+                Book found = null;
+                for (Book b : library.getBooks()) {
+                    if (b.getId().equals(bookId)) {
+                        found = b;
+                        break;
+                    }
+                }
+                if (!success) {
+                    JOptionPane.showMessageDialog(panel, "You have not borrowed this book or book not found.", "Error", JOptionPane.ERROR_MESSAGE);
+                } else {
+                    JOptionPane.showMessageDialog(panel, "Book returned successfully!\nCurrent stock: " + (found != null ? found.getStock() : "N/A"), "Success", JOptionPane.INFORMATION_MESSAGE);
+                    // Refresh the panel to update the table
+                    SwingUtilities.getWindowAncestor(panel).dispose();
+                    new LibraryGUI(library, false, currentUser).setVisible(true);
+                }
             }
         });
         panel.add(inputPanel, BorderLayout.SOUTH);

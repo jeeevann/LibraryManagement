@@ -52,6 +52,17 @@ public class LoginGUI extends JFrame {
         gbc.gridwidth = 2;
         add(messageLabel, gbc);
 
+        // Add Back button
+        JButton backButton = new JButton("Back");
+        gbc.gridx = 0;
+        gbc.gridy = 4;
+        gbc.gridwidth = 2;
+        add(backButton, gbc);
+        backButton.addActionListener(e -> {
+            dispose();
+            new MainLoginGUI().setVisible(true);
+        });
+
         loginButton.addActionListener(e -> handleLogin());
     }
 

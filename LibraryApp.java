@@ -26,7 +26,7 @@ public class LibraryApp {
                     String author = sc.nextLine();
                     System.out.print("Stock: ");
                     int stock = sc.nextInt();
-                    sc.nextLine(); // consume newline
+                    sc.nextLine(); 
                     lib.addBook(new Book(id, title, author, stock));
                 }
                 case 2 -> {

@@ -22,6 +22,15 @@ public class MainLoginGUI extends JFrame {
             dispose();
             new UserLoginGUI().setVisible(true);
         });
+
+        // Add Back button (for consistency, but here it just exits)
+        JButton backButton = new JButton("Back");
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        add(backButton, gbc);
+        backButton.addActionListener(e -> {
+            dispose(); // or System.exit(0);
+        });
     }
 
     public static void main(String[] args) {
